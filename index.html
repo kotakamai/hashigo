@@ -551,7 +551,9 @@ const fmtTime = min => `${String(Math.floor(min / 60) % 24).padStart(2, "0")}:${
 const fmtDur = min => min >= 60 ? `${Math.floor(min / 60)}時間${min % 60 ? min % 60 + "分" : ""}` : `${min}分`;
 
 /* ===== 地図（Google Maps APIキーがあればGoogle Maps、なければLeaflet/OSM） ===== */
-const GMAPS_KEY = new URLSearchParams(location.search).get("gmapskey") || localStorage.getItem("hashigo-gmaps-key") || "";
+/* 既定のGoogle Maps APIキー（リファラー制限済みキーを想定。空ならOSM地図で動作） */
+const DEFAULT_GMAPS_KEY = "AIzaSyBpIsegRw0yMDb90aK0rsdaAlcb09TjuCA";
+const GMAPS_KEY = new URLSearchParams(location.search).get("gmapskey") || localStorage.getItem("hashigo-gmaps-key") || DEFAULT_GMAPS_KEY;
 let map = null, routeLayer = null;  // Leaflet
 let gmap = null, gOverlays = [];    // Google Maps
 let mapBackend = "none";
@@ -589,7 +591,7 @@ function initMap() {
     update(false);
   };
   const s = document.createElement("script");
-  s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(GMAPS_KEY)}&language=ja&region=JP&callback=__gmapsReady`;
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(GMAPS_KEY)}&language=ja&region=JP&loading=async&callback=__gmapsReady`;
   s.async = true;
   s.onerror = () => { initLeaflet(); update(false); };
   document.head.appendChild(s);
